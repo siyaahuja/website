@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>siya's space</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <section id="hero">
+    <h1 id="brand" class="flash"><span class="brat-title">siya's space</span></h1>
+    <p class="scroll-hint">scroll down ↓</p>
+  </section>
+
+  <header id="site-header">
+    <button id="maze-mode-btn" type="button">maze mode</button>
+  </header>
+
+  <main id="stage">
+    <section id="road-wrap">
+      <canvas id="maze-canvas"></canvas>
+      <div id="milestones"></div>
+      <div id="maze-start" hidden></div>
+      <div id="maze-goal" hidden></div>
+      <div id="maze-piggy" hidden></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>made by siya. pink is my favourite colour</p>
+  </footer>
+
+  <div id="card-overlay" class="card-overlay hidden">
+    <div class="card">
+      <button id="card-close" class="card-close">×</button>
+      <div id="card-content"></div>
+    </div>
+  </div>
+
+  <div id="puzzle-overlay" class="card-overlay hidden">
+    <div class="puzzle-panel">
+      <button id="puzzle-close" class="card-close">×</button>
+      <div class="puzzle-statement">
+        25 unicorns. 5 racetracks (only 5 unicorns fit per race, and there's
+        no stopwatch, only finish order). work out the minimum number of
+        races it takes to find the fastest 3 unicorns, then go run them.
+      </div>
+      <div id="puzzle-controls"></div>
+      <div id="puzzle-board"></div>
+    </div>
+  </div>
+
+  <div id="puzzle-result-overlay" class="card-overlay hidden">
+    <div id="puzzle-result-content" class="puzzle-result"></div>
+  </div>
+
+  <div id="piggy-cursor" aria-hidden="true"></div>
+
+  <script src="js/milestones.js"></script>
+  <script src="js/piggy-sprite.js"></script>
+  <script src="js/unicorn-sprite.js"></script>
+  <script src="js/puzzle.js"></script>
+  <script src="js/maze.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/scroll-brand.js"></script>
+  <script src="js/confetti.js"></script>
+</body>
+</html>

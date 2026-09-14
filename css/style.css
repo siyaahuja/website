@@ -1,0 +1,783 @@
+/* ---------- reset / base ---------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --pink-bg: #ffb3dd;
+  --wall-pink: #ff2d95;
+  --brat-pink: #ec1cae;
+  --brat-pink-deep: #93125f;
+  --silver: #dcdce6;
+  --silver-dark: #9797a8;
+  --corridor: #2a0f22;
+  --dot: #fff2fa;
+  --ink: #1a0f16;
+  --card-bg: #fff2fa;
+  --accent: #ec1cae;
+  --header-h: 4rem;
+}
+
+html, body {
+  background: var(--pink-bg);
+  background-image: radial-gradient(circle, var(--wall-pink) 3px, transparent 3px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: "Press Start 2P", monospace;
+  overflow-x: hidden;
+  image-rendering: pixelated;
+}
+
+body.piggy-cursor-active,
+body.piggy-cursor-active * {
+  cursor: none !important;
+}
+
+h1, h2, h3, .brat-title, button, .tag, .milestone-label {
+  text-transform: lowercase;
+}
+
+/* ---------- pixel cursor sprite ---------- */
+#piggy-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 52px;
+  margin-left: -22px;
+  margin-top: -26px;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.35));
+}
+#piggy-cursor svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.piggy-visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 85%;
+}
+#piggy-cursor.piggy-jump {
+  animation: piggy-jump 0.3s ease-out;
+}
+@keyframes piggy-jump {
+  0% { margin-top: -26px; }
+  40% { margin-top: -40px; }
+  100% { margin-top: -26px; }
+}
+.piggy-visual.piggy-fart {
+  animation: piggy-fart-recoil 0.32s ease-out;
+}
+@keyframes piggy-fart-recoil {
+  0% { transform: scale(1, 1) rotate(0deg); }
+  30% { transform: scale(1.2, 0.8) rotate(-8deg); }
+  60% { transform: scale(0.95, 1.05) rotate(4deg); }
+  100% { transform: scale(1, 1) rotate(0deg); }
+}
+#piggy-cursor.hidden { display: none; }
+
+/* ---------- hero: big flash, then it just sits there ---------- */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* #brand is fixed and glides continuously from the centre of the hero to
+   the header's left slot, driven frame-by-frame by scroll position in
+   js/scroll-brand.js — top/left/transform are set inline per frame, no
+   CSS transition here (that would fight the scrubbing and lag). */
+#brand {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+#brand.flash .brat-title {
+  animation: brandFlash 0.85s steps(1, end) 1;
+}
+@keyframes brandFlash {
+  0%, 100% { opacity: 1; }
+  12%, 36%, 60% { opacity: 0.15; }
+  24%, 48%, 72% { opacity: 1; }
+}
+
+/* #brand is position:fixed (see below) so it no longer takes up space in
+   #hero's flow — anchor the hint at a fixed offset below hero-centre
+   instead of relying on flex/margin stacking, so the two can't collide. */
+.scroll-hint {
+  position: absolute;
+  top: calc(50% + 5.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-size: 0.65rem;
+  opacity: 0.7;
+  animation: bob 1.2s steps(2) infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+.brat-title {
+  display: inline-block;
+  font-family: "Press Start 2P", monospace;
+  font-weight: 400;
+  font-size: 5rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  line-height: 1.3;
+  white-space: nowrap;
+  text-shadow:
+    3px 0 0 var(--wall-pink),
+    -3px 0 0 var(--wall-pink),
+    0 3px 0 var(--wall-pink),
+    0 -3px 0 var(--wall-pink),
+    6px 6px 0 var(--ink);
+  padding: 0.3em 0.5em;
+  border: 3px solid transparent;
+  background: transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+#brand.chip .brat-title {
+  background: var(--card-bg);
+  border-color: var(--silver-dark);
+  box-shadow: 3px 3px 0 var(--brat-pink-deep);
+}
+
+/* ---------- header: fixed bar, revealed in sync with #brand's glide ---------- */
+#site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 1.1rem;
+  background: var(--brat-pink);
+  border-bottom: 4px solid var(--ink);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.45);
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+#maze-mode-btn {
+  background: linear-gradient(180deg, #f4f4fa, var(--silver) 55%, var(--silver-dark));
+  color: var(--brat-pink-deep);
+  border: 3px solid var(--ink);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--brat-pink-deep);
+  transition: transform 0.1s steps(2);
+}
+body.piggy-cursor-active #maze-mode-btn { cursor: none; }
+#maze-mode-btn:hover { transform: translateY(-2px); }
+#maze-mode-btn.active {
+  background: linear-gradient(180deg, var(--brat-pink), var(--brat-pink-deep));
+  color: var(--silver);
+}
+
+/* ---------- stage / maze ---------- */
+#stage {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+#road-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+#maze-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+#milestones {
+  position: absolute;
+  inset: 0;
+}
+
+.milestone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  z-index: 2;
+}
+body.piggy-cursor-active .milestone { cursor: none; }
+
+.milestone.side-right { flex-direction: row; }
+.milestone.side-left  { flex-direction: row-reverse; }
+
+.milestone-marker {
+  width: 48px;
+  height: 48px;
+  background: var(--card-bg);
+  border: 4px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  box-shadow: 4px 4px 0 var(--silver-dark);
+  transition: transform 0.1s steps(2);
+  flex-shrink: 0;
+  clip-path: polygon(
+    20% 0%, 80% 0%, 100% 20%, 100% 80%,
+    80% 100%, 20% 100%, 0% 80%, 0% 20%
+  );
+}
+
+.milestone:hover .milestone-marker {
+  transform: scale(1.1);
+}
+
+.milestone[data-status="building"] .milestone-marker {
+  background: var(--accent);
+  color: var(--silver);
+}
+
+.milestone[data-status="next"] .milestone-marker {
+  background: var(--corridor);
+  border-style: dashed;
+  border-color: var(--silver-dark);
+  color: var(--dot);
+  opacity: 0.85;
+  animation: pellet-pulse 1s steps(2) infinite;
+}
+
+@keyframes pellet-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.milestone-label {
+  background: var(--ink);
+  color: var(--dot);
+  padding: 0.5rem 0.8rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--silver-dark);
+  border: 2px solid var(--ink);
+}
+
+/* ---------- maze-mode start/goal markers ---------- */
+#maze-start,
+#maze-goal {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
+  z-index: 8;
+  pointer-events: none;
+}
+#maze-start svg,
+#maze-goal svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#maze-start[hidden],
+#maze-goal[hidden] { display: none; }
+
+#maze-goal {
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  margin-top: -17px;
+  filter: drop-shadow(0 0 5px rgba(236, 28, 174, 0.85));
+  animation: maze-goal-pulse 1s ease-in-out infinite;
+}
+@keyframes maze-goal-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+/* ---------- maze-mode playable character ---------- */
+#maze-piggy {
+  position: absolute;
+  width: 30px;
+  height: 36px;
+  margin-left: -15px;
+  margin-top: -18px;
+  z-index: 10;
+  transition: left 0.14s linear, top 0.14s linear;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.35));
+}
+#maze-piggy svg { width: 100%; height: 100%; display: block; }
+#maze-piggy[hidden] { display: none; }
+
+/* ---------- footer ---------- */
+footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0.6rem;
+  font-size: 0.55rem;
+  font-weight: 400;
+  background: var(--corridor);
+  color: var(--dot);
+  opacity: 0.75;
+}
+
+/* ---------- card overlay ---------- */
+.card-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 15, 22, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1.5rem;
+  transition: opacity 0.15s ease;
+}
+
+.card-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  background: var(--card-bg);
+  border: 4px solid var(--ink);
+  max-width: 480px;
+  width: 100%;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+}
+
+.card-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--ink);
+  line-height: 1;
+  font-family: "Press Start 2P", monospace;
+}
+body.piggy-cursor-active .card-close { cursor: none; }
+
+.card h3 {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.card .card-tagline {
+  margin-top: 0.6rem;
+  font-size: 0.65rem;
+  color: var(--accent);
+}
+
+.card .card-desc {
+  margin-top: 1.2rem;
+  line-height: 1.6;
+}
+
+.card .card-tags {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background: var(--ink);
+  color: var(--dot);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.6rem;
+  font-family: "Press Start 2P", monospace;
+  border: 2px solid var(--ink);
+}
+
+.card .card-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-size: 0.65rem;
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* ---------- puzzle milestone marker + tooltip ---------- */
+.puzzle-marker {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(2px 2px 0 rgba(26, 15, 22, 0.35));
+}
+.puzzle-marker svg { width: 100%; height: 100%; display: block; }
+
+.milestone-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  background: var(--ink);
+  color: var(--dot);
+  padding: 0.4rem 0.7rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  white-space: nowrap;
+  border: 2px solid var(--silver-dark);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.puzzle-milestone:hover .milestone-tooltip {
+  opacity: 1;
+  transform: translate(-50%, -12px);
+}
+
+/* ---------- puzzle game ---------- */
+.puzzle-panel {
+  position: relative;
+  background: var(--card-bg);
+  border: 4px solid var(--ink);
+  max-width: 920px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2.5rem 1.5rem 1.5rem;
+  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+}
+
+.puzzle-statement {
+  background: #ffffff;
+  border: 3px solid var(--ink);
+  padding: 1.1rem 1.2rem;
+  font-size: 0.62rem;
+  line-height: 1.9;
+  box-shadow: 4px 4px 0 var(--silver-dark);
+  margin-bottom: 1.3rem;
+}
+
+.puzzle-race-count {
+  font-size: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.puzzle-instruction {
+  font-size: 0.6rem;
+  line-height: 1.9;
+  margin-bottom: 0.9rem;
+}
+.puzzle-instruction strong { color: var(--brat-pink-deep); }
+
+.puzzle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.puzzle-actions .pixel-btn { margin-bottom: 0; }
+
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(180deg, #f4f4fa, var(--silver) 55%, var(--silver-dark));
+  color: var(--brat-pink-deep);
+  border: 3px solid var(--ink);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--brat-pink-deep);
+  margin-bottom: 1rem;
+}
+.pixel-btn svg { width: 16px; height: 16px; }
+body.piggy-cursor-active .pixel-btn { cursor: none; }
+.pixel-btn:hover { transform: translateY(-2px); }
+.pixel-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0 var(--silver-dark);
+}
+body.piggy-cursor-active .pixel-btn:disabled { cursor: none; }
+
+.puzzle-board {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.9rem 0.6rem;
+  border: 2px dashed var(--silver-dark);
+  padding: 1rem 0.8rem;
+}
+
+.unicorn-icon {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+}
+.unicorn-icon svg { width: 100%; height: 100%; }
+.unicorn-icon.selectable {
+  cursor: pointer;
+  border-color: var(--silver-dark);
+  background: rgba(255,255,255,0.45);
+}
+body.piggy-cursor-active .unicorn-icon.selectable { cursor: none; }
+.unicorn-icon.selected {
+  border-color: var(--brat-pink-deep);
+  background: rgba(236, 28, 174, 0.18);
+  box-shadow: 2px 2px 0 var(--brat-pink-deep);
+}
+.unicorn-icon.eliminated {
+  opacity: 0.9;
+  filter: grayscale(1) brightness(0.45);
+  border-color: #3a3a42;
+  background: rgba(0, 0, 0, 0.2);
+}
+.unicorn-num {
+  position: absolute;
+  bottom: -5px;
+  right: -6px;
+  background: var(--ink);
+  color: var(--dot);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.48rem;
+  padding: 1px 3px;
+}
+.unicorn-pick {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  background: #ffd66b;
+  color: var(--ink);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.42rem;
+  padding: 1px 4px;
+  border: 1px solid var(--ink);
+}
+.unicorn-elim-toggle {
+  position: absolute;
+  top: -8px;
+  left: -6px;
+  width: 15px;
+  height: 15px;
+  line-height: 11px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-size: 0.55rem;
+  font-family: "Press Start 2P", monospace;
+  border: 1px solid var(--ink);
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.55;
+}
+body.piggy-cursor-active .unicorn-elim-toggle { cursor: none; }
+.unicorn-elim-toggle:hover { opacity: 1; }
+.unicorn-icon.eliminated .unicorn-elim-toggle {
+  background: var(--brat-pink-deep);
+  color: var(--dot);
+  opacity: 1;
+}
+
+.puzzle-history {
+  border-top: 3px solid var(--ink);
+  padding-top: 0.9rem;
+}
+.puzzle-history-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65rem;
+  margin-bottom: 0.6rem;
+}
+.puzzle-history-empty {
+  font-size: 0.6rem;
+  line-height: 1.7;
+  opacity: 0.6;
+}
+.puzzle-history-row {
+  padding: 0.7rem 0;
+  border-bottom: 1px dashed var(--silver-dark);
+}
+.puzzle-history-n {
+  display: block;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  color: var(--brat-pink-deep);
+  margin-bottom: 1.1rem;
+}
+
+/* each race's finishers, winner first, laid out in a row (wraps to a
+   stacked column on narrow screens) */
+.hist-unicorns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 0.7rem;
+  padding-top: 0.3rem;
+}
+.hist-unicorn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+.hist-unicorn svg { width: 100%; height: 100%; display: block; }
+.hist-unicorn-pos {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.4rem;
+  padding: 1px 4px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.hist-unicorn-num {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: var(--ink);
+  color: var(--dot);
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.42rem;
+  padding: 1px 3px;
+}
+.hist-unicorn.pos-1 .hist-unicorn-pos { background: #ffd66b; }
+.hist-unicorn.pos-2 .hist-unicorn-pos { background: var(--silver); }
+.hist-unicorn.pos-3 .hist-unicorn-pos { background: #cd8a4f; color: var(--dot); }
+.hist-unicorn.pos-4 .hist-unicorn-pos { background: #ff8fce; }
+.hist-unicorn.pos-5 .hist-unicorn-pos { background: #c7c7e0; }
+
+#puzzle-result-overlay { z-index: 60; }
+.puzzle-result {
+  background: var(--card-bg);
+  border: 4px solid var(--ink);
+  padding: 2rem;
+  text-align: center;
+  max-width: 320px;
+  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+}
+.result-piggy svg {
+  width: 120px;
+  height: 144px;
+  display: block;
+  margin: 0 auto 1.1rem;
+}
+.result-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1rem;
+  margin-bottom: 1.3rem;
+}
+
+/* ---------- click burst: confetti + pig fart ---------- */
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1500;
+  animation: confettiBurst 0.85s ease-out forwards;
+}
+@keyframes confettiBurst {
+  0% {
+    transform: translate(var(--start-x), var(--start-y)) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(calc(var(--start-x) + var(--dx)), calc(var(--start-y) + var(--dy)))
+      rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+.fart-burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1500;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: fartFloat 1s ease-out forwards;
+}
+.fart-cloud {
+  position: relative;
+  width: 70px;
+  height: 40px;
+}
+.fart-cloud svg {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.3));
+}
+.fart-cloud svg.puff-1 { width: 40px; height: 20px; left: 15px; top: 10px; animation: puffGrow 1s ease-out forwards; }
+.fart-cloud svg.puff-2 { width: 26px; height: 13px; left: 0; top: 0; animation: puffGrow 1s ease-out 0.08s forwards; opacity: 0; }
+.fart-cloud svg.puff-3 { width: 22px; height: 11px; left: 44px; top: 2px; animation: puffGrow 1s ease-out 0.14s forwards; opacity: 0; }
+@keyframes puffGrow {
+  0% { opacity: 0; transform: scale(0.3); }
+  25% { opacity: 0.95; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5) translateY(-14px); }
+}
+.fart-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85rem;
+  color: var(--brat-pink);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  margin-top: 2px;
+}
+@keyframes fartFloat {
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(0) scale(0.5) rotate(-6deg); }
+  15% { opacity: 1; transform: translate(-50%, -50%) translateY(-4px) scale(1.15) rotate(4deg); }
+  30% { transform: translate(-50%, -50%) translateY(-8px) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-52px) scale(1.1) rotate(0deg); }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  :root { --header-h: 3.4rem; }
+  .milestone-label { font-size: 0.5rem; padding: 0.45rem 0.6rem; }
+  .milestone-marker { width: 38px; height: 38px; font-size: 0.75rem; }
+  .brat-title { font-size: clamp(1.8rem, 10vw, 3rem); }
+  .header-brand {
+    font-size: clamp(0.6rem, 3.2vw, 0.85rem);
+    padding: 0.25rem 0.4rem;
+  }
+  footer { font-size: 0.55rem; padding: 0.5rem; }
+  #maze-mode-btn { font-size: 0.5rem; padding: 0.45rem 0.7rem; }
+}
