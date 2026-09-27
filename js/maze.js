@@ -290,7 +290,6 @@ function checkMazeGoalReached(r, c) {
 
 function activateMazeMode() {
   mazeActive = true;
-  document.body.classList.add("maze-active");
   mazeCurrentCell = { r: 0, c: 0 };
 
   const el = document.getElementById("maze-piggy");
@@ -319,7 +318,6 @@ function activateMazeMode() {
 
 function deactivateMazeMode() {
   mazeActive = false;
-  document.body.classList.remove("maze-active");
 
   const el = document.getElementById("maze-piggy");
   if (el) el.hidden = true;
