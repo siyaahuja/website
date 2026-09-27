@@ -1,8 +1,9 @@
 /*
   EDIT ME — add more stops here later. Stops with type "telephone" get the
   special icon marker (see maze.js); everything else is a normal card.
-  The unicorn puzzle isn't a stop any more: it lives at the maze's finish
-  line in maze mode, and as a floating bubble outside it (js/puzzle-bubble.js).
+  Outside maze mode the maze is hidden and the telephone + unicorn puzzle
+  float as bubbles (js/floating-bubbles.js). In maze mode the telephone is
+  a stop and the unicorn puzzle waits at the finish line.
 */
 
 const MILESTONES = [
