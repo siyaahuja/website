@@ -186,8 +186,13 @@ function placeMazeEndpoints() {
   const goalPos = cellCenter(mazeRows - 1, mazeCols - 1);
   goalEl.style.left = `${goalPos.x}px`;
   goalEl.style.top = `${goalPos.y}px`;
-  // the unicorn puzzle is the prize at the end of the maze
+  // the unicorn puzzle sits at the end of the maze: always visible and
+  // clickable, and walking the pig onto it in maze mode opens it too
   goalEl.innerHTML = unicornSVG();
+  goalEl.onclick = (e) => {
+    e.stopPropagation();
+    openPuzzle();
+  };
 }
 
 function buildMaze() {
@@ -298,9 +303,7 @@ function activateMazeMode() {
   placeMazePiggyAt(0, 0);
 
   const startEl = document.getElementById("maze-start");
-  const goalEl = document.getElementById("maze-goal");
   if (startEl) startEl.hidden = false;
-  if (goalEl) goalEl.hidden = false;
 
   const cursor = document.getElementById("piggy-cursor");
   if (cursor) cursor.classList.add("hidden");
@@ -323,9 +326,7 @@ function deactivateMazeMode() {
   if (el) el.hidden = true;
 
   const startEl = document.getElementById("maze-start");
-  const goalEl = document.getElementById("maze-goal");
   if (startEl) startEl.hidden = true;
-  if (goalEl) goalEl.hidden = true;
 
   const cursor = document.getElementById("piggy-cursor");
   if (cursor) cursor.classList.remove("hidden");

@@ -315,9 +315,12 @@ body.piggy-cursor-active .milestone { cursor: none; }
   height: 44px;
   margin-left: -22px;
   margin-top: -22px;
+  pointer-events: auto;
+  cursor: pointer;
   filter: drop-shadow(0 0 5px rgba(236, 28, 174, 0.85));
   animation: maze-goal-pulse 1s ease-in-out infinite;
 }
+body.piggy-cursor-active #maze-goal { cursor: none; }
 @keyframes maze-goal-pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.18); }
