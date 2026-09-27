@@ -203,7 +203,10 @@ body.piggy-cursor-active #maze-mode-btn { cursor: none; }
 
 #road-wrap {
   position: absolute;
-  inset: 0;
+  top: var(--header-h);
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 #maze-canvas {
@@ -308,16 +311,78 @@ body.piggy-cursor-active .milestone { cursor: none; }
 #maze-goal[hidden] { display: none; }
 
 #maze-goal {
-  width: 34px;
-  height: 34px;
-  margin-left: -17px;
-  margin-top: -17px;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-top: -22px;
   filter: drop-shadow(0 0 5px rgba(236, 28, 174, 0.85));
   animation: maze-goal-pulse 1s ease-in-out infinite;
 }
 @keyframes maze-goal-pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.18); }
+}
+
+/* ---------- floating puzzle bubble (outside maze mode) ---------- */
+#puzzle-bubble {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 84px;
+  height: 84px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.95) 0 7%, rgba(255,255,255,0) 14%),
+    radial-gradient(circle at 50% 50%, rgba(255,242,250,0.15) 55%, rgba(236,28,174,0.35) 80%, rgba(139,63,214,0.45) 100%);
+  box-shadow:
+    inset -6px -8px 14px rgba(139, 63, 214, 0.25),
+    0 0 14px rgba(236, 28, 174, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  will-change: transform;
+}
+body.piggy-cursor-active #puzzle-bubble { cursor: none; }
+body.maze-active #puzzle-bubble { display: none; }
+
+.bubble-unicorn {
+  width: 50px;
+  height: 50px;
+  display: block;
+  filter: drop-shadow(2px 2px 0 rgba(26, 15, 22, 0.35));
+  animation: bubble-bob 2.4s ease-in-out infinite;
+}
+.bubble-unicorn svg { width: 100%; height: 100%; display: block; }
+#puzzle-bubble:hover .bubble-unicorn { animation-duration: 0.8s; }
+@keyframes bubble-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-4px) rotate(4deg); }
+}
+
+.bubble-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -4px);
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 0.6rem;
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 0.35rem 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+#puzzle-bubble:hover .bubble-tooltip,
+#puzzle-bubble:focus-visible .bubble-tooltip {
+  opacity: 1;
+  transform: translate(-50%, -10px);
 }
 
 /* ---------- maze-mode playable character ---------- */
@@ -430,16 +495,25 @@ body.piggy-cursor-active .card-close { cursor: none; }
   text-decoration: underline;
 }
 
-/* ---------- puzzle milestone marker + tooltip ---------- */
-.puzzle-marker {
-  width: 72px;
-  height: 72px;
+/* ---------- icon milestones (puzzle, telephone, ...) marker + tooltip ---------- */
+.puzzle-marker,
+.telephone-marker {
   display: flex;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(2px 2px 0 rgba(26, 15, 22, 0.35));
 }
-.puzzle-marker svg { width: 100%; height: 100%; display: block; }
+.puzzle-marker {
+  width: 72px;
+  height: 72px;
+}
+.telephone-marker {
+  /* grid is 11x13 (see js/telephone-sprite.js) — keep pixels square */
+  width: 66px;
+  height: 78px;
+}
+.puzzle-marker svg,
+.telephone-marker svg { width: 100%; height: 100%; display: block; }
 
 .milestone-tooltip {
   position: absolute;
@@ -457,9 +531,162 @@ body.piggy-cursor-active .card-close { cursor: none; }
   pointer-events: none;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
-.puzzle-milestone:hover .milestone-tooltip {
+.icon-milestone:hover .milestone-tooltip {
   opacity: 1;
   transform: translate(-50%, -12px);
+}
+
+/* ---------- project card: optional tabs ---------- */
+.card-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+  border-bottom: 3px solid var(--ink);
+}
+.card-tab {
+  background: none;
+  border: none;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  padding: 0.5rem 0.2rem;
+  cursor: pointer;
+  color: var(--silver-dark);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+  transition: color 0.1s steps(2);
+}
+body.piggy-cursor-active .card-tab { cursor: none; }
+.card-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.card-tab-panel {
+  margin-top: 1.2rem;
+}
+.card-tab-panel .card-desc { margin-top: 0; }
+
+/* ---------- project card: step-by-step (non-technical tab) ---------- */
+.phone-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.phone-step {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.phone-step-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.phone-step-icons .step-icon {
+  width: 34px;
+  height: 34px;
+  display: block;
+  filter: drop-shadow(1px 1px 0 rgba(26, 15, 22, 0.35));
+}
+.phone-step-icons .step-arrow {
+  font-size: 0.7rem;
+  color: var(--silver-dark);
+}
+.phone-step p {
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+/* printer stack: sticker slides out from behind/under the printer's slot,
+   on loop, so it visibly reads as "a sticker gets printed" rather than
+   two icons just sitting next to each other */
+.printer-stack {
+  position: relative;
+  width: 40px;
+  height: 52px;
+  flex-shrink: 0;
+}
+.printer-stack .step-icon-sticker {
+  position: absolute;
+  left: 9px;
+  top: 26px;
+  width: 22px;
+  height: 22px;
+  z-index: 1;
+  animation: sticker-print 2s ease-in-out infinite;
+}
+.printer-stack .step-icon-printer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  z-index: 2;
+}
+@keyframes sticker-print {
+  0%   { transform: translateY(-16px); opacity: 0; }
+  15%  { opacity: 1; }
+  55%  { transform: translateY(14px); opacity: 1; }
+  85%  { transform: translateY(14px); opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+
+/* equalizer bars pulsing next to the speaker */
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+  margin-left: 0.2rem;
+}
+.eq-bars span {
+  width: 4px;
+  background: var(--accent);
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+.eq-bars span:nth-child(1) { animation-delay: 0s; }
+.eq-bars span:nth-child(2) { animation-delay: 0.2s; }
+.eq-bars span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes eq-bounce {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+/* ---------- project card: technical tab ---------- */
+.card-tech-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.card-tech-list li {
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+.card-tech-list code {
+  background: var(--ink);
+  color: var(--dot);
+  padding: 0.15rem 0.4rem;
+  font-size: 0.65rem;
+}
+
+/* ---------- project card: optional sticker gallery ---------- */
+.card .card-stickers {
+  margin-top: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.card .card-sticker {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  background: var(--dot);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--silver-dark);
+  image-rendering: pixelated;
 }
 
 /* ---------- puzzle game ---------- */

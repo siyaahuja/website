@@ -142,15 +142,15 @@ function placeMilestones() {
     el.style.left = `${pos.x}px`;
     el.style.top = `${pos.y}px`;
 
-    if (data.type === "puzzle") {
-      el.className = "milestone puzzle-milestone";
+    if (data.type === "telephone") {
+      el.className = "milestone icon-milestone telephone-milestone";
       el.innerHTML = `
-        <div class="milestone-marker puzzle-marker">${unicornSVG()}</div>
+        <div class="milestone-marker telephone-marker">${telephoneSVG()}</div>
         <div class="milestone-tooltip">${data.title}</div>
       `;
       el.addEventListener("click", (e) => {
         e.stopPropagation();
-        openPuzzle();
+        openMilestoneCard(data);
       });
       milestonesEl.appendChild(el);
       return;
@@ -186,7 +186,8 @@ function placeMazeEndpoints() {
   const goalPos = cellCenter(mazeRows - 1, mazeCols - 1);
   goalEl.style.left = `${goalPos.x}px`;
   goalEl.style.top = `${goalPos.y}px`;
-  goalEl.innerHTML = checkeredFlagSVG();
+  // the unicorn puzzle is the prize at the end of the maze
+  goalEl.innerHTML = unicornSVG();
 }
 
 function buildMaze() {
@@ -242,9 +243,7 @@ function checkMazeMilestoneHit(r, c) {
   const rect = wrap.getBoundingClientRect();
   if (window.spawnConfetti) spawnConfetti(rect.left + pos.x, rect.top + pos.y);
 
-  const data = MILESTONES[idx];
-  if (data.type === "puzzle") openPuzzle();
-  else openMilestoneCard(data);
+  openMilestoneCard(MILESTONES[idx]);
 }
 
 function handleMazeKeydown(e) {
@@ -283,10 +282,15 @@ function checkMazeGoalReached(r, c) {
   const wrap = document.getElementById("road-wrap");
   const rect = wrap.getBoundingClientRect();
   if (window.spawnConfettiBomb) spawnConfettiBomb(rect.left + pos.x, rect.top + pos.y);
+  // let the confetti land, then hand over the prize
+  setTimeout(() => {
+    if (mazeActive && window.openPuzzle) openPuzzle();
+  }, 700);
 }
 
 function activateMazeMode() {
   mazeActive = true;
+  document.body.classList.add("maze-active");
   mazeCurrentCell = { r: 0, c: 0 };
 
   const el = document.getElementById("maze-piggy");
@@ -315,6 +319,7 @@ function activateMazeMode() {
 
 function deactivateMazeMode() {
   mazeActive = false;
+  document.body.classList.remove("maze-active");
 
   const el = document.getElementById("maze-piggy");
   if (el) el.hidden = true;
