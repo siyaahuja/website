@@ -4,35 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>siya's space</title>
+<meta name="theme-color" content="#0b3a8a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <section id="hero">
-    <h1 id="brand" class="flash"><span class="brat-title">siya's space</span></h1>
-    <p class="scroll-hint">scroll down ↓</p>
-  </section>
+  <svg id="sheet-frame" aria-hidden="true">
+    <rect class="frame-outer" x="0" y="0" width="100%" height="100%" pathLength="1"></rect>
+    <rect class="frame-inner" x="6" y="6" width="calc(100% - 12px)" height="calc(100% - 12px)" pathLength="1"></rect>
+  </svg>
+  <div class="guide guide-x" aria-hidden="true"></div>
+  <div class="guide guide-y" aria-hidden="true"></div>
 
-  <header id="site-header">
-    <button id="maze-mode-btn" type="button">maze mode</button>
-  </header>
+  <div class="app">
+    <aside class="intro">
+      <p class="eyebrow mono reveal" style="--d:0">sheet 01 / portfolio</p>
+      <h1 id="title" class="title reveal" style="--d:1">siya's space</h1>
+      <p class="intro-lede reveal" style="--d:2">a working drawing of the things i'm making. hover a component to find it on the plan.</p>
 
-  <main id="stage">
-    <section id="road-wrap">
-      <canvas id="maze-canvas"></canvas>
-      <div id="milestones"></div>
-      <div id="maze-start" hidden></div>
-      <div id="maze-goal" title="my favourite puzzle"></div>
-      <div id="maze-piggy" hidden></div>
-    </section>
-  </main>
+      <dl id="spec" class="spec reveal" style="--d:3"></dl>
 
-  <footer>
-    <p>made by siya. pink is my favourite colour</p>
-  </footer>
+      <p class="section-label mono reveal" style="--d:4">components</p>
+      <ul id="project-list" class="project-list reveal" style="--d:5"></ul>
+
+      <div class="title-block reveal" style="--d:6">
+        <div><span>drawn by</span>siya</div>
+        <div><span>scale</span>1 : 1</div>
+        <div><span>rev</span>02 · blueprint</div>
+        <div><span>cursor</span><b id="coords">x 0000 · y 0000</b></div>
+      </div>
+    </aside>
+
+    <main class="drawing reveal" style="--d:2">
+      <div class="drawing-bar">
+        <span class="mono">fig. 1 — the maze</span>
+        <span class="maze-hint">roll the ball bearing to the key with <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></span>
+        <button id="maze-mode-btn" type="button">maze mode</button>
+      </div>
+      <div class="drawing-body">
+        <div class="ruler ruler-x"><i class="ruler-mark"></i></div>
+        <div class="ruler ruler-y"><i class="ruler-mark"></i></div>
+        <section id="road-wrap">
+          <canvas id="maze-canvas"></canvas>
+          <svg id="maze-trail" aria-hidden="true"><polyline points=""></polyline></svg>
+          <div id="milestones"></div>
+          <div id="maze-start" hidden></div>
+          <div id="maze-goal" title="the horse race puzzle"></div>
+          <div id="maze-walker" hidden></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <svg id="leader" aria-hidden="true"><path pathLength="1"></path><circle r="3"></circle></svg>
 
   <div id="card-overlay" class="card-overlay hidden">
     <div class="card">
@@ -45,9 +72,9 @@
     <div class="puzzle-panel">
       <button id="puzzle-close" class="card-close">×</button>
       <div class="puzzle-statement">
-        25 unicorns. 5 racetracks (only 5 unicorns fit per race, and there's
+        25 horses. 5 racetracks (only 5 horses fit per race, and there's
         no stopwatch, only finish order). work out the minimum number of
-        races it takes to find the fastest 3 unicorns, then go run them.
+        races it takes to find the fastest 3 horses, then go run them.
       </div>
       <div id="puzzle-controls"></div>
       <div id="puzzle-board"></div>
@@ -58,16 +85,16 @@
     <div id="puzzle-result-content" class="puzzle-result"></div>
   </div>
 
-  <div id="piggy-cursor" aria-hidden="true"></div>
+  <div id="cursor" aria-hidden="true"></div>
 
-  <script src="js/piggy-sprite.js"></script>
-  <script src="js/unicorn-sprite.js"></script>
-  <script src="js/telephone-sprite.js"></script>
+  <script src="js/metal-sprites.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/profile.js"></script>
   <script src="js/milestones.js"></script>
   <script src="js/puzzle.js"></script>
   <script src="js/maze.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/scroll-brand.js"></script>
   <script src="js/confetti.js"></script>
+  <script src="js/blueprint.js"></script>
 </body>
 </html>

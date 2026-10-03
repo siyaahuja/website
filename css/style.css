@@ -1,222 +1,489 @@
-/* ---------- reset / base ---------- */
+/* ---------- reset / base: blueprint sheet ---------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --pink-bg: #ffb3dd;
-  --wall-pink: #ff2d95;
-  --brat-pink: #ec1cae;
-  --brat-pink-deep: #93125f;
-  --silver: #dcdce6;
-  --silver-dark: #9797a8;
-  --corridor: #2a0f22;
-  --dot: #fff2fa;
-  --ink: #1a0f16;
-  --card-bg: #fff2fa;
-  --accent: #ec1cae;
-  --header-h: 4rem;
+  /* blueprint paper, white linework, machined silver. no other colours. */
+  --paper: #0b3a8a;
+  --paper-deep: #072a66;
+  --grid-minor: rgba(234, 242, 255, 0.05);
+  --grid-major: rgba(234, 242, 255, 0.11);
+  --cyan: #7fd3ff;
+  --signal: #ffffff;
+  --glow: 0 0 12px rgba(127, 211, 255, 0.55);
+
+  /* machined-metal finish shared by buttons, sockets and plates */
+  --steel: linear-gradient(180deg, #f7f9fc 0%, #dfe4ea 22%, #b6bfca 48%, #9aa4b2 52%, #d3d9e1 78%, #eef1f5 100%);
+  --steel-dark: linear-gradient(180deg, #5c6673 0%, #3a424e 50%, #2a313b 100%);
+  --metal-edge: #151b25;
+
+  /* shared tokens (the puzzle + card styles further down use these) */
+  --ink: #eaf2ff;
+  --dot: #0b2f6e;
+  --card-bg: #0d3d8f;
+  --silver: #c9d8f0;
+  --silver-dark: rgba(234, 242, 255, 0.4);
+  --corridor: #061f4d;
+  --ice: #bfe8ff;
+  --accent: #7fd3ff;
+  --muted: rgba(234, 242, 255, 0.62);
+  --line: rgba(234, 242, 255, 0.18);
+  --panel: rgba(234, 242, 255, 0.025);
+  --radius: 4px;
+  --shadow: 0 0 0 1px var(--line);
+
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --gutter: clamp(16px, 2.4vw, 36px);
 }
 
 html, body {
-  background: var(--pink-bg);
-  background-image: radial-gradient(circle, var(--wall-pink) 3px, transparent 3px);
-  background-size: 28px 28px;
-  color: var(--ink);
-  font-family: "Press Start 2P", monospace;
-  overflow-x: hidden;
-  image-rendering: pixelated;
+  height: 100%;
+  overflow: hidden;
 }
 
-body.piggy-cursor-active,
-body.piggy-cursor-active * {
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(4, 20, 52, 0.55) 100%),
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
+  background-size: 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: 0 0, -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  animation: paperIn 0.9s var(--ease) both;
+}
+@keyframes paperIn {
+  from { background-size: 100% 100%, 132px 132px, 132px 132px, 26px 26px, 26px 26px; opacity: 0; }
+  to { opacity: 1; }
+}
+
+body.cursor-active,
+body.cursor-active * {
   cursor: none !important;
 }
 
-h1, h2, h3, .brat-title, button, .tag, .milestone-label {
+h1, h2, h3, button, .tag {
   text-transform: lowercase;
 }
 
-/* ---------- pixel cursor sprite ---------- */
-#piggy-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 44px;
-  height: 52px;
-  margin-left: -22px;
-  margin-top: -26px;
-  pointer-events: none;
-  z-index: 9999;
-  will-change: transform;
-  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.35));
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-#piggy-cursor svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.piggy-visual {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform-origin: 50% 85%;
-}
-#piggy-cursor.piggy-jump {
-  animation: piggy-jump 0.3s ease-out;
-}
-@keyframes piggy-jump {
-  0% { margin-top: -26px; }
-  40% { margin-top: -40px; }
-  100% { margin-top: -26px; }
-}
-.piggy-visual.piggy-fart {
-  animation: piggy-fart-recoil 0.32s ease-out;
-}
-@keyframes piggy-fart-recoil {
-  0% { transform: scale(1, 1) rotate(0deg); }
-  30% { transform: scale(1.2, 0.8) rotate(-8deg); }
-  60% { transform: scale(0.95, 1.05) rotate(4deg); }
-  100% { transform: scale(1, 1) rotate(0deg); }
-}
-#piggy-cursor.hidden { display: none; }
 
-/* ---------- hero: big flash, then it just sits there ---------- */
-#hero {
+/* staggered "drafting" entrance: elements fade up one after another */
+.reveal {
+  animation: draftIn 0.7s var(--ease) both;
+  animation-delay: calc(var(--d, 0) * 90ms + 250ms);
+}
+@keyframes draftIn {
+  from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* ---------- sheet frame: a border that draws itself on load ---------- */
+#sheet-frame {
+  position: fixed;
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+#sheet-frame rect {
+  fill: none;
+  stroke: var(--ink);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawLine 1.6s var(--ease) forwards;
+}
+#sheet-frame .frame-outer { stroke-opacity: 0.45; stroke-width: 1.5; }
+#sheet-frame .frame-inner { stroke-opacity: 0.18; animation-delay: 0.3s; }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+/* ---------- crosshair guides that follow the mouse ---------- */
+.guide {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  background: rgba(127, 211, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.guide-x { left: 0; right: 0; height: 1px; top: 0; }
+.guide-y { top: 0; bottom: 0; width: 1px; left: 0; }
+body.guides-on .guide { opacity: 1; }
+
+/* ---------- one-screen layout: spec column | drawing ---------- */
+.app {
   position: relative;
-  min-height: 100vh;
+  z-index: 1;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(290px, 380px) minmax(0, 1fr);
+  gap: var(--gutter);
+  padding: calc(var(--gutter) + 8px);
+}
+
+.intro {
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
 }
 
-/* #brand is fixed and glides continuously from the centre of the hero to
-   the header's left slot, driven frame-by-frame by scroll position in
-   js/scroll-brand.js — top/left/transform are set inline per frame, no
-   CSS transition here (that would fight the scrubbing and lag). */
-#brand {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  pointer-events: none;
-}
-#brand.flash .brat-title {
-  animation: brandFlash 0.85s steps(1, end) 1;
-}
-@keyframes brandFlash {
-  0%, 100% { opacity: 1; }
-  12%, 36%, 60% { opacity: 0.15; }
-  24%, 48%, 72% { opacity: 1; }
-}
-
-/* #brand is position:fixed (see below) so it no longer takes up space in
-   #hero's flow — anchor the hint at a fixed offset below hero-centre
-   instead of relying on flex/margin stacking, so the two can't collide. */
-.scroll-hint {
-  position: absolute;
-  top: calc(50% + 5.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  font-size: 0.65rem;
-  opacity: 0.7;
-  animation: bob 1.2s steps(2) infinite;
-}
-@keyframes bob {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(8px); }
-}
-
-.brat-title {
-  display: inline-block;
-  font-family: "Press Start 2P", monospace;
-  font-weight: 400;
-  font-size: 5rem;
-  letter-spacing: 0.05em;
-  color: var(--ink);
-  line-height: 1.3;
-  white-space: nowrap;
-  text-shadow:
-    3px 0 0 var(--wall-pink),
-    -3px 0 0 var(--wall-pink),
-    0 3px 0 var(--wall-pink),
-    0 -3px 0 var(--wall-pink),
-    6px 6px 0 var(--ink);
-  padding: 0.3em 0.5em;
-  border: 3px solid transparent;
-  background: transparent;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-#brand.chip .brat-title {
-  background: var(--card-bg);
-  border-color: var(--silver-dark);
-  box-shadow: 3px 3px 0 var(--brat-pink-deep);
-}
-
-/* ---------- header: fixed bar, revealed in sync with #brand's glide ---------- */
-#site-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--header-h);
+.eyebrow {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0 1.1rem;
-  background: var(--brat-pink);
-  border-bottom: 4px solid var(--ink);
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.45);
-  z-index: 20;
-  opacity: 0;
-  transform: translateY(-100%);
+  gap: 0.6rem;
+  color: var(--cyan);
+}
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+
+.title {
+  margin-top: 0.9rem;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+.title .scramble { color: var(--cyan); }
+
+.intro-lede {
+  margin-top: 0.9rem;
+  color: var(--muted);
+  max-width: 32ch;
+}
+
+/* spec table: who i am, where i work, where i studied */
+.spec {
+  margin-top: 1.6rem;
+  border-top: 1px solid var(--line);
+}
+.spec-row {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.spec-row dt {
+  color: var(--muted);
+  padding-top: 0.2rem;
+}
+.spec-row dd { min-width: 0; }
+
+/* now / studied rows open their stop on the maze */
+.spec-link {
+  position: relative;
+  grid-template-columns: 5.2rem 1fr auto;
+  align-items: start;
+  cursor: pointer;
+  transition: background 0.3s ease, padding 0.3s var(--ease);
+}
+.spec-link:hover,
+.spec-link.is-linked,
+.spec-link:focus-visible {
+  background: rgba(127, 211, 255, 0.06);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  outline: none;
+}
+.spec-arrow {
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  opacity: 0.5;
+  padding-top: 0.1rem;
+  transition: transform 0.3s var(--ease), opacity 0.3s ease;
+}
+.spec-link:hover .spec-arrow,
+.spec-link.is-linked .spec-arrow { opacity: 1; transform: translateX(3px); }
+.spec-main { display: block; font-weight: 500; }
+.spec-sub { display: block; font-size: 0.85rem; color: var(--muted); }
+.spec-todo {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--signal);
+  border: 1px dashed var(--signal);
+  padding: 0.05rem 0.45rem;
+}
+
+.section-label {
+  margin-top: 1.6rem;
+  margin-bottom: 0.6rem;
+  color: var(--muted);
+}
+
+.project-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.project {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0.8rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+/* a cyan scan line sweeps across on hover */
+.project::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(127, 211, 255, 0.14), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s var(--ease);
+}
+.project:hover, .project.is-linked {
+  border-color: var(--cyan);
+  background: rgba(127, 211, 255, 0.06);
+}
+.project:hover::after { transform: translateX(100%); }
+
+.project-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--cyan);
+}
+.project-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, 0.16), transparent 60%), rgba(2, 10, 30, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -8px 16px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(234, 242, 255, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+.project:hover .project-icon,
+.project.is-linked .project-icon {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 1px var(--cyan), var(--glow);
+}
+.project-icon :is(svg, img) { transition: transform 0.4s var(--ease); }
+.project:hover .project-icon :is(svg, img) { transform: translateY(-2px) scale(1.08); }
+.project-icon :is(svg, img) { width: 36px; height: 36px; display: block; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45)); }
+.project-text { min-width: 0; flex: 1; }
+.project-title { display: block; font-weight: 600; text-transform: lowercase; }
+.project-tagline {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.project-arrow {
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  transition: transform 0.3s var(--ease);
+}
+.project:hover .project-arrow { transform: translateX(4px); }
+
+/* title block: the box in the corner of every technical drawing */
+.title-block {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.title-block > div {
+  padding: 0.45rem 0.6rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.title-block > div:nth-child(2n) { border-right: none; }
+.title-block > div:nth-last-child(-n+2) { border-bottom: none; }
+.title-block span { display: block; color: var(--muted); font-size: 0.56rem; }
+.title-block .wide { grid-column: 1 / -1; border-right: none; }
+#coords { color: var(--cyan); font-variant-numeric: tabular-nums; }
+
+/* ---------- drawing panel: fig. 1, the maze ---------- */
+.drawing {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  position: relative;
+}
+/* corner registration ticks */
+.drawing::before,
+.drawing::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid var(--cyan);
   pointer-events: none;
+}
+.drawing::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.drawing::after { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.drawing-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.drawing-bar .mono { color: var(--cyan); }
+.maze-hint {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.maze-hint kbd {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--line);
 }
 
 #maze-mode-btn {
-  background: linear-gradient(180deg, #f4f4fa, var(--silver) 55%, var(--silver-dark));
-  color: var(--brat-pink-deep);
-  border: 3px solid var(--ink);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.65rem;
-  padding: 0.55rem 0.9rem;
+  flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--steel);
+  color: var(--metal-edge);
+  border: 1px solid var(--metal-edge);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem 0.5rem 0.75rem;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--brat-pink-deep);
-  transition: transform 0.1s steps(2);
+  box-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 3px 0 #0a1a3d, 0 6px 14px -6px rgba(2, 10, 30, 0.9);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.2s ease;
 }
-body.piggy-cursor-active #maze-mode-btn { cursor: none; }
-#maze-mode-btn:hover { transform: translateY(-2px); }
+/* status LED: off = dark glass, on = glowing blue */
+#maze-mode-btn::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #6b7685, #1d2430);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+#maze-mode-btn:hover { filter: brightness(1.06); }
+#maze-mode-btn:active,
 #maze-mode-btn.active {
-  background: linear-gradient(180deg, var(--brat-pink), var(--brat-pink-deep));
-  color: var(--silver);
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.5), 0 1px 0 #0a1a3d;
+}
+#maze-mode-btn.active::before {
+  background: radial-gradient(circle at 35% 30%, #ffffff, #7fd3ff 45%, #2f80ed);
+  box-shadow: 0 0 8px 2px rgba(127, 211, 255, 0.8);
 }
 
-/* ---------- stage / maze ---------- */
-#stage {
-  min-height: 100vh;
+/* rulers along the top and left edge, with a white marker that tracks the mouse */
+.drawing-body {
   position: relative;
-  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  padding: 26px 18px 18px 26px;
 }
+.ruler {
+  position: absolute;
+  color: var(--silver-dark);
+  pointer-events: none;
+}
+.ruler-x {
+  top: 0; left: 26px; right: 18px; height: 14px;
+  background:
+    repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 60px) bottom / 100% 10px no-repeat,
+    repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 12px) bottom / 100% 5px no-repeat;
+}
+.ruler-y {
+  left: 0; top: 26px; bottom: 18px; width: 14px;
+  background:
+    repeating-linear-gradient(180deg, currentColor 0 1px, transparent 1px 60px) right / 10px 100% no-repeat,
+    repeating-linear-gradient(180deg, currentColor 0 1px, transparent 1px 12px) right / 5px 100% no-repeat;
+}
+.ruler-mark {
+  position: absolute;
+  background: var(--signal);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.ruler-mark { box-shadow: var(--glow); }
+.ruler-x .ruler-mark { top: 0; bottom: 0; width: 2px; margin-left: -1px; }
+.ruler-y .ruler-mark { left: 0; right: 0; height: 2px; margin-top: -1px; }
+.drawing-body.tracking .ruler-mark { opacity: 1; }
 
 #road-wrap {
-  position: absolute;
-  top: var(--header-h);
-  right: 0;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 #maze-canvas {
   position: absolute;
   inset: 0;
+  display: block;
+}
+
+#maze-trail {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
-  image-rendering: pixelated;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
 }
+#maze-trail polyline {
+  fill: none;
+  filter: drop-shadow(0 0 3px rgba(127, 211, 255, 0.9));
+  stroke: var(--signal);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: marchingAnts 0.8s linear infinite;
+}
+@keyframes marchingAnts { to { stroke-dashoffset: -11; } }
 
 #milestones {
   position: absolute;
@@ -232,63 +499,134 @@ body.piggy-cursor-active #maze-mode-btn { cursor: none; }
   cursor: pointer;
   z-index: 2;
 }
-body.piggy-cursor-active .milestone { cursor: none; }
-
 .milestone.side-right { flex-direction: row; }
 .milestone.side-left  { flex-direction: row-reverse; }
 
 .milestone-marker {
-  width: 48px;
-  height: 48px;
-  background: var(--card-bg);
-  border: 4px solid var(--ink);
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--cyan);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Press Start 2P", monospace;
-  font-size: 1rem;
-  box-shadow: 4px 4px 0 var(--silver-dark);
-  transition: transform 0.1s steps(2);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--paper);
+  transition: transform 0.3s var(--ease);
   flex-shrink: 0;
-  clip-path: polygon(
-    20% 0%, 80% 0%, 100% 20%, 100% 80%,
-    80% 100%, 20% 100%, 0% 80%, 0% 20%
-  );
 }
-
-.milestone:hover .milestone-marker {
-  transform: scale(1.1);
-}
-
-.milestone[data-status="building"] .milestone-marker {
-  background: var(--accent);
-  color: var(--silver);
-}
-
-.milestone[data-status="next"] .milestone-marker {
-  background: var(--corridor);
-  border-style: dashed;
-  border-color: var(--silver-dark);
-  color: var(--dot);
-  opacity: 0.85;
-  animation: pellet-pulse 1s steps(2) infinite;
-}
-
-@keyframes pellet-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
+.milestone:hover .milestone-marker { transform: scale(1.12); }
+.milestone[data-status="building"] .milestone-marker { border-color: var(--signal); color: var(--signal); }
+.milestone[data-status="next"] .milestone-marker { border-style: dashed; opacity: 0.8; }
 
 .milestone-label {
-  background: var(--ink);
-  color: var(--dot);
-  padding: 0.5rem 0.8rem;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.6rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   white-space: nowrap;
-  box-shadow: 3px 3px 0 var(--silver-dark);
-  border: 2px solid var(--ink);
 }
+
+/* a sonar-style ring pulses around whatever a project row is pointing at */
+.milestone.is-linked::before,
+#maze-goal.is-linked::before,
+#maze-goal:hover::before,
+.milestone:hover::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border: 1px solid var(--cyan);
+  border-radius: 50%;
+  animation: sonar 1.4s var(--ease) infinite;
+  pointer-events: none;
+}
+.milestone.is-linked::after,
+#maze-goal.is-linked::after,
+.milestone:hover::after,
+#maze-goal:hover::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--signal), var(--signal)) top left / 12px 1.5px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) top left / 1.5px 12px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) top right / 12px 1.5px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) top right / 1.5px 12px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) bottom left / 12px 1.5px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) bottom left / 1.5px 12px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) bottom right / 12px 1.5px no-repeat,
+    linear-gradient(var(--signal), var(--signal)) bottom right / 1.5px 12px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(127, 211, 255, 0.9));
+  animation: lockOn 0.4s var(--ease) both;
+}
+@keyframes lockOn {
+  from { transform: scale(1.6) rotate(45deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes sonar {
+  from { transform: scale(0.5); opacity: 1; }
+  to { transform: scale(1.5); opacity: 0; }
+}
+
+/* leader line from a hovered project row to its spot on the plan */
+#leader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
+}
+#leader path {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+#leader path.on { animation: drawLine 0.55s var(--ease) forwards; }
+#leader circle { fill: var(--cyan); opacity: 0; transition: opacity 0.2s ease 0.4s; }
+#leader circle.on { opacity: 1; }
+
+/* ---------- silver arrow cursor ---------- */
+#cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  /* the arrow's tip sits at (3, 2) in its 24-unit viewBox */
+  margin: -2px 0 0 -3px;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+#cursor svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+  transform-origin: 3px 2px;
+  filter: drop-shadow(1px 2px 2px rgba(2, 10, 30, 0.55));
+  transition: transform 0.2s var(--ease), filter 0.2s ease;
+}
+#cursor.pointing svg {
+  transform: rotate(-12deg) scale(1.08);
+  filter: drop-shadow(0 0 6px rgba(127, 211, 255, 0.7)) drop-shadow(1px 2px 2px rgba(2, 10, 30, 0.55));
+}
+#cursor.pressed svg { transform: scale(0.86); }
+#cursor.away { opacity: 0; }
 
 /* ---------- maze-mode start/goal markers ---------- */
 #maze-start,
@@ -302,7 +640,7 @@ body.piggy-cursor-active .milestone { cursor: none; }
   pointer-events: none;
 }
 #maze-start svg,
-#maze-goal svg {
+#maze-goal :is(svg, img) {
   width: 100%;
   height: 100%;
   display: block;
@@ -311,198 +649,396 @@ body.piggy-cursor-active .milestone { cursor: none; }
 #maze-goal[hidden] { display: none; }
 
 #maze-goal {
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  margin-top: -22px;
+  width: 92px;
+  height: 72px;
+  margin-left: -46px;
+  margin-top: -36px;
   pointer-events: auto;
   cursor: pointer;
-  filter: drop-shadow(0 0 5px rgba(236, 28, 174, 0.85));
-  animation: maze-goal-pulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 6px 6px rgba(2, 10, 30, 0.6)) drop-shadow(0 0 10px rgba(127, 211, 255, 0.45));
 }
-body.piggy-cursor-active #maze-goal { cursor: none; }
-@keyframes maze-goal-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.18); }
-}
+#maze-goal :is(svg, img) { animation: hover-float 3.6s ease-in-out infinite; transition: transform 0.35s var(--ease); }
+#maze-goal:hover :is(svg, img) { animation-play-state: paused; transform: translateY(-4px) scale(1.12); }
 
-/* ---------- maze-mode playable character ---------- */
-#maze-piggy {
+/* ---------- maze-mode playable ball bearing ---------- */
+#maze-walker {
   position: absolute;
-  width: 30px;
-  height: 36px;
-  margin-left: -15px;
-  margin-top: -18px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
   z-index: 10;
-  transition: left 0.14s linear, top 0.14s linear;
-  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.35));
+  transition: left 0.16s var(--ease), top 0.16s var(--ease), transform 0.16s linear;
+  filter: drop-shadow(0 3px 4px rgba(2, 10, 30, 0.6));
 }
-#maze-piggy svg { width: 100%; height: 100%; display: block; }
-#maze-piggy[hidden] { display: none; }
+#maze-walker svg { width: 100%; height: 100%; display: block; }
+#maze-walker[hidden] { display: none; }
 
-/* ---------- footer ---------- */
-footer {
-  flex-shrink: 0;
-  text-align: center;
-  padding: 0.6rem;
-  font-size: 0.55rem;
-  font-weight: 400;
-  background: var(--corridor);
-  color: var(--dot);
-  opacity: 0.75;
-}
-
-/* ---------- card overlay ---------- */
+/* ---------- card overlay: unfolds like a drawing sheet ---------- */
 .card-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(26, 15, 22, 0.7);
+  background: rgba(4, 20, 52, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
   padding: 1.5rem;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.3s ease;
 }
-
 .card-overlay.hidden {
   opacity: 0;
   pointer-events: none;
 }
 
+.card,
+.puzzle-panel,
+.puzzle-result {
+  /* four corner ticks drawn with gradients, so the panel reads as a sheet */
+  background:
+    linear-gradient(var(--cyan), var(--cyan)) top left / 16px 2px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) top left / 2px 16px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) bottom right / 16px 2px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) bottom right / 2px 16px no-repeat,
+    linear-gradient(var(--grid-minor) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--card-bg) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 40px 100px -30px rgba(2, 10, 30, 0.8) !important;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.55s var(--ease), transform 0.55s var(--ease) !important;
+}
+.card-overlay.hidden .card,
+.card-overlay.hidden .puzzle-panel,
+.card-overlay.hidden .puzzle-result {
+  clip-path: inset(50% 0 50% 0);
+  transform: none;
+}
+
 .card {
   position: relative;
-  background: var(--card-bg);
-  border: 4px solid var(--ink);
-  max-width: 480px;
+  max-width: 540px;
   width: 100%;
-  padding: 2.5rem 2rem 2rem;
-  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2.25rem 2rem 2rem;
 }
 
 .card-close {
   position: absolute;
-  top: 0.8rem;
-  right: 1rem;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
   background: none;
-  border: none;
-  font-size: 1.8rem;
+  border: 1px solid var(--line);
+  font-size: 1.1rem;
   cursor: pointer;
   color: var(--ink);
   line-height: 1;
-  font-family: "Press Start 2P", monospace;
+  font-family: var(--font-mono);
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.3s var(--ease);
 }
-body.piggy-cursor-active .card-close { cursor: none; }
+.card-close:hover { border-color: var(--cyan); color: var(--signal); box-shadow: var(--glow); transform: rotate(90deg); }
 
 .card h3 {
-  font-family: "Press Start 2P", monospace;
-  font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 1.4;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
-
 .card .card-tagline {
-  margin-top: 0.6rem;
-  font-size: 0.65rem;
-  color: var(--accent);
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--cyan);
 }
-
 .card .card-desc {
   margin-top: 1.2rem;
   line-height: 1.6;
 }
-
 .card .card-tags {
   margin-top: 1.4rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
-
 .tag {
-  background: var(--ink);
-  color: var(--dot);
-  padding: 0.35rem 0.7rem;
-  font-size: 0.6rem;
-  font-family: "Press Start 2P", monospace;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
 }
-
 .card .card-link {
   display: inline-block;
   margin-top: 1.5rem;
-  font-size: 0.65rem;
-  color: var(--ink);
-  text-decoration: underline;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cyan);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
 }
 
 /* ---------- icon milestones (puzzle, telephone, ...) marker + tooltip ---------- */
 .puzzle-marker,
-.telephone-marker {
+.icon-marker {
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(2px 2px 0 rgba(26, 15, 22, 0.35));
+  border: none;
+  border-radius: 0;
+  background: none;
+  /* a cast shadow on the paper + a faint blue halo */
+  filter: drop-shadow(0 6px 5px rgba(2, 10, 30, 0.55)) drop-shadow(0 0 10px rgba(127, 211, 255, 0.3));
+  animation: hover-float 3.6s ease-in-out infinite;
+  transition: transform 0.35s var(--ease), filter 0.35s ease;
 }
-.puzzle-marker {
-  width: 72px;
-  height: 72px;
+/* stagger the idle float so the pieces don't bob in unison */
+[data-milestone="1"] .icon-marker { animation-delay: -1.2s; }
+[data-milestone="2"] .icon-marker { animation-delay: -2.4s; }
+@keyframes hover-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
-.telephone-marker {
-  /* grid is 11x13 (see js/telephone-sprite.js) — keep pixels square */
+/* hover: lift off the paper and tilt like it's being picked up */
+.milestone:hover .icon-marker,
+.milestone.is-linked .icon-marker {
+  animation-play-state: paused;
+  transform: perspective(200px) translateY(-5px) rotateX(14deg) rotateY(-12deg) scale(1.12);
+  filter: drop-shadow(0 12px 8px rgba(2, 10, 30, 0.6)) drop-shadow(0 0 14px rgba(127, 211, 255, 0.7));
+}
+.puzzle-marker { width: 52px; height: 52px; }
+.icon-marker {
   width: 66px;
-  height: 78px;
+  height: 66px;
 }
 .puzzle-marker svg,
-.telephone-marker svg { width: 100%; height: 100%; display: block; }
+.icon-marker :is(svg, img) { width: 100%; height: 100%; display: block; }
+
+/* cut-out photo icons keep their own proportions inside whatever box they're in */
+.photo-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
 
 .milestone-tooltip {
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translate(-50%, -6px);
-  background: var(--ink);
-  color: var(--dot);
-  padding: 0.4rem 0.7rem;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.55rem;
+  transform: translate(-50%, -4px);
+  background: var(--paper);
+  border: 1px solid var(--cyan);
+  color: var(--ink);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   white-space: nowrap;
-  border: 2px solid var(--silver-dark);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease, transform 0.3s var(--ease);
 }
-.icon-milestone:hover .milestone-tooltip {
+.icon-milestone:hover .milestone-tooltip,
+.icon-milestone.is-linked .milestone-tooltip {
   opacity: 1;
-  transform: translate(-50%, -12px);
+  transform: translate(-50%, -10px);
+}
+
+/* ---------- career card: classified file ---------- */
+.dossier {
+  position: relative;
+  margin-top: 1.4rem;
+  padding: 1.2rem 1.2rem 1.4rem;
+  border: 1px dashed var(--line);
+  background: rgba(2, 10, 30, 0.18);
+  overflow: hidden;
+}
+.dossier-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.6rem;
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+.dossier-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+.dossier-text span {
+  display: inline-block;
+  animation: draftIn 0.45s var(--ease) both;
+  animation-delay: calc(var(--i) * 55ms + 250ms);
+}
+.redacted {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 1.2rem;
+}
+.redacted span {
+  position: relative;
+  display: block;
+  height: 0.7rem;
+  width: var(--w);
+  background: var(--ink);
+  opacity: 0.85;
+  transform-origin: left;
+  animation: redact 0.5s var(--ease) both;
+  animation-delay: calc(var(--i) * 110ms + 1.2s);
+}
+.redacted span:hover { background: var(--cyan); }
+.redacted span:hover::after {
+  content: "nice try";
+  color: var(--paper-deep);
+  position: absolute;
+  left: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
+@keyframes redact {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.stamp {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, var(--glow);
+  position: absolute;
+  right: 1rem;
+  bottom: 1.1rem;
+  padding: 0.35rem 0.7rem;
+  border: 2px solid var(--signal);
+  color: var(--signal);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  background: rgba(11, 58, 138, 0.85);
+  transform: rotate(-10deg);
+  animation: stampIn 0.45s cubic-bezier(.3, 1.6, .5, 1) 1.8s both;
+}
+@keyframes stampIn {
+  from { transform: rotate(-10deg) scale(2.6); opacity: 0; }
+  to { transform: rotate(-10deg) scale(1); opacity: 1; }
+}
+
+/* ---------- education card: subjects drawn out from the centre ---------- */
+.edu-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 1rem;
+  overflow: visible;
+}
+.edu-orbit {
+  fill: none;
+  stroke: var(--line);
+  stroke-dasharray: 3 5;
+  animation: draftIn 0.6s ease both 0.1s;
+}
+.edu-edge {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawLine 0.55s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 120ms + 300ms);
+}
+/* centre plate is a chrome bar (filter + gradient come from metal-sprites.js) */
+.edu-centre rect { fill: url(#chrome-face); filter: url(#chrome-plate); }
+.edu-centre text {
+  fill: var(--metal-edge);
+  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.edu-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nodePop 0.5s cubic-bezier(.3, 1.5, .5, 1) both;
+  animation-delay: calc(var(--i) * 120ms + 700ms);
+}
+.edu-node rect {
+  fill: var(--paper-deep);
+  stroke: var(--ink);
+  stroke-opacity: 0.7;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+.edu-node:hover rect { fill: rgba(127, 211, 255, 0.18); stroke: var(--cyan); stroke-opacity: 1; }
+.edu-label {
+  fill: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.edu-num {
+  fill: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+@keyframes nodePop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* ---------- project card: optional tabs ---------- */
 .card-tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 1.2rem;
   margin-top: 1.2rem;
-  border-bottom: 3px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 .card-tab {
+  position: relative;
   background: none;
   border: none;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.55rem;
-  padding: 0.5rem 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 0;
   cursor: pointer;
-  color: var(--silver-dark);
-  border-bottom: 3px solid transparent;
-  margin-bottom: -3px;
-  transition: color 0.1s steps(2);
+  color: var(--muted);
+  transition: color 0.2s ease;
 }
-body.piggy-cursor-active .card-tab { cursor: none; }
-.card-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+.card-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--cyan);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
 }
+.card-tab.active { color: var(--ink); }
+.card-tab.active::after { transform: scaleX(1); }
 .card-tab-panel {
   margin-top: 1.2rem;
+  animation: draftIn 0.45s var(--ease) both;
 }
 .card-tab-panel .card-desc { margin-top: 0; }
 
@@ -528,14 +1064,14 @@ body.piggy-cursor-active .card-tab { cursor: none; }
   width: 34px;
   height: 34px;
   display: block;
-  filter: drop-shadow(1px 1px 0 rgba(26, 15, 22, 0.35));
+  filter: drop-shadow(1px 1px 0 rgba(2, 10, 30, 0.45));
 }
 .phone-step-icons .step-arrow {
   font-size: 0.7rem;
   color: var(--silver-dark);
 }
 .phone-step p {
-  font-size: 0.72rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 
@@ -603,14 +1139,15 @@ body.piggy-cursor-active .card-tab { cursor: none; }
   margin-top: 1rem;
 }
 .card-tech-list li {
-  font-size: 0.72rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 .card-tech-list code {
-  background: var(--ink);
-  color: var(--dot);
-  padding: 0.15rem 0.4rem;
-  font-size: 0.65rem;
+  background: rgba(234, 242, 255, 0.08);
+  color: var(--ice);
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
 }
 
 /* ---------- project card: optional sticker gallery ---------- */
@@ -625,8 +1162,8 @@ body.piggy-cursor-active .card-tab { cursor: none; }
   height: 90px;
   object-fit: contain;
   background: var(--dot);
-  border: 3px solid var(--ink);
-  box-shadow: 3px 3px 0 var(--silver-dark);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
   image-rendering: pixelated;
 }
 
@@ -634,36 +1171,39 @@ body.piggy-cursor-active .card-tab { cursor: none; }
 .puzzle-panel {
   position: relative;
   background: var(--card-bg);
-  border: 4px solid var(--ink);
+  border-radius: var(--radius);
   max-width: 920px;
   width: 100%;
   max-height: 88vh;
   overflow-y: auto;
-  padding: 2.5rem 1.5rem 1.5rem;
-  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+  padding: 2.5rem 1.75rem 1.75rem;
+  box-shadow: 0 30px 80px -20px rgba(42, 15, 34, 0.5);
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
 }
 
 .puzzle-statement {
-  background: #ffffff;
-  border: 3px solid var(--ink);
-  padding: 1.1rem 1.2rem;
-  font-size: 0.62rem;
-  line-height: 1.9;
-  box-shadow: 4px 4px 0 var(--silver-dark);
+  background: rgba(234, 242, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 1.1rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  box-shadow: var(--shadow);
   margin-bottom: 1.3rem;
 }
 
 .puzzle-race-count {
-  font-size: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   margin-bottom: 0.7rem;
 }
 
 .puzzle-instruction {
-  font-size: 0.6rem;
-  line-height: 1.9;
+  font-size: 0.95rem;
+  line-height: 1.6;
   margin-bottom: 0.9rem;
 }
-.puzzle-instruction strong { color: var(--brat-pink-deep); }
+.puzzle-instruction strong { color: var(--ice); }
 
 .puzzle-actions {
   display: flex;
@@ -673,30 +1213,40 @@ body.piggy-cursor-active .card-tab { cursor: none; }
 }
 .puzzle-actions .pixel-btn { margin-bottom: 0; }
 
+/* brushed-metal buttons */
 .pixel-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: linear-gradient(180deg, #f4f4fa, var(--silver) 55%, var(--silver-dark));
-  color: var(--brat-pink-deep);
-  border: 3px solid var(--ink);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.6rem;
-  padding: 0.55rem 0.85rem;
+  background: linear-gradient(180deg, #ffffff 0%, #dfe4eb 45%, #aab3c0 55%, #e4e8ee 100%);
+  color: #1d2430;
+  border: 1px solid #1d2430;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.55rem 1rem;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--brat-pink-deep);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 12px -6px rgba(2, 10, 30, 0.8);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s ease, filter 0.2s ease;
   margin-bottom: 1rem;
 }
 .pixel-btn svg { width: 16px; height: 16px; }
-body.piggy-cursor-active .pixel-btn { cursor: none; }
-.pixel-btn:hover { transform: translateY(-2px); }
+.pixel-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: inset 0 1px 0 #fff, 0 0 0 1px var(--cyan), 0 8px 18px -8px rgba(127, 211, 255, 0.6);
+}
+.pixel-btn:active { transform: translateY(0); }
 .pixel-btn:disabled {
-  opacity: 0.45;
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 3px 3px 0 var(--silver-dark);
+  filter: none;
+  box-shadow: none;
 }
-body.piggy-cursor-active .pixel-btn:disabled { cursor: none; }
 
 .puzzle-board {
   display: flex;
@@ -706,174 +1256,218 @@ body.piggy-cursor-active .pixel-btn:disabled { cursor: none; }
 .puzzle-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.9rem 0.6rem;
-  border: 2px dashed var(--silver-dark);
+  gap: 1.1rem 0.6rem;
+  background: rgba(234, 242, 255, 0.03);
+  border: 1px dashed var(--line);
   padding: 1rem 0.8rem;
 }
 
-.unicorn-icon {
+.horse-icon {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 52px;
   margin: 0 auto;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid transparent;
+  border: 1px dashed transparent;
+  transition: transform 0.25s var(--ease), border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
 }
-.unicorn-icon svg { width: 100%; height: 100%; }
-.unicorn-icon.selectable {
+.horse-icon svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 3px rgba(2, 10, 30, 0.5)); }
+.horse-icon.selectable {
   cursor: pointer;
-  border-color: var(--silver-dark);
-  background: rgba(255,255,255,0.45);
+  border-color: var(--line);
+  background: rgba(234, 242, 255, 0.03);
 }
-body.piggy-cursor-active .unicorn-icon.selectable { cursor: none; }
-.unicorn-icon.selected {
-  border-color: var(--brat-pink-deep);
-  background: rgba(236, 28, 174, 0.18);
-  box-shadow: 2px 2px 0 var(--brat-pink-deep);
+.horse-icon.selectable:hover { transform: translateY(-3px); border-color: var(--silver-dark); }
+.horse-icon.selected {
+  border: 1px solid var(--cyan);
+  background: rgba(127, 211, 255, 0.12);
+  box-shadow: 0 0 14px -2px rgba(127, 211, 255, 0.55);
 }
-.unicorn-icon.eliminated {
-  opacity: 0.9;
-  filter: grayscale(1) brightness(0.45);
-  border-color: #3a3a42;
-  background: rgba(0, 0, 0, 0.2);
+.horse-icon.eliminated {
+  opacity: 0.35;
+  filter: grayscale(1);
 }
-.unicorn-num {
+.horse-icon.eliminated::after {
+  box-shadow: var(--glow);
+  content: "";
   position: absolute;
-  bottom: -5px;
-  right: -6px;
-  background: var(--ink);
-  color: var(--dot);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.48rem;
-  padding: 1px 3px;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  height: 1px;
+  background: var(--signal);
+  transform: rotate(-35deg);
 }
-.unicorn-pick {
+.horse-num {
+  position: absolute;
+  bottom: -7px;
+  right: -7px;
+  background: linear-gradient(180deg, #ffffff, #c3cad4 55%, #9aa3b0);
+  color: #1d2430;
+  border: 1px solid #1d2430;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.horse-pick {
   position: absolute;
   top: -8px;
-  right: -6px;
-  background: #ffd66b;
-  color: var(--ink);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.42rem;
-  padding: 1px 4px;
-  border: 1px solid var(--ink);
+  right: -7px;
+  background: var(--cyan);
+  color: var(--paper-deep);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 2px 5px;
 }
-.unicorn-elim-toggle {
+.horse-elim-toggle {
   position: absolute;
   top: -8px;
-  left: -6px;
-  width: 15px;
-  height: 15px;
-  line-height: 11px;
+  left: -7px;
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
   background: var(--card-bg);
   color: var(--ink);
-  font-size: 0.55rem;
-  font-family: "Press Start 2P", monospace;
-  border: 1px solid var(--ink);
+  font-size: 0.6rem;
+  font-family: var(--font-mono);
+  border: 1px solid var(--line);
   padding: 0;
   cursor: pointer;
-  opacity: 0.55;
+  opacity: 0.6;
 }
-body.piggy-cursor-active .unicorn-elim-toggle { cursor: none; }
-.unicorn-elim-toggle:hover { opacity: 1; }
-.unicorn-icon.eliminated .unicorn-elim-toggle {
-  background: var(--brat-pink-deep);
-  color: var(--dot);
+.horse-elim-toggle:hover { opacity: 1; border-color: var(--signal); }
+.horse-icon.eliminated .horse-elim-toggle {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--paper-deep);
   opacity: 1;
 }
 
 .puzzle-history {
-  border-top: 3px solid var(--ink);
+  border-top: 1px solid var(--line);
   padding-top: 0.9rem;
 }
 .puzzle-history-title {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.65rem;
+  font-weight: 600;
+  font-size: 1rem;
   margin-bottom: 0.6rem;
 }
 .puzzle-history-empty {
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   line-height: 1.7;
   opacity: 0.6;
 }
 .puzzle-history-row {
   padding: 0.7rem 0;
-  border-bottom: 1px dashed var(--silver-dark);
+  border-bottom: 1px solid var(--line);
 }
 .puzzle-history-n {
   display: block;
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.5rem;
-  color: var(--brat-pink-deep);
-  margin-bottom: 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 1.3rem;
 }
 
 /* each race's finishers, winner first, laid out in a row (wraps to a
    stacked column on narrow screens) */
-.hist-unicorns {
+.hist-horses {
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem 0.7rem;
   padding-top: 0.3rem;
 }
-.hist-unicorn {
+.hist-horse {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 42px;
+  animation: draftIn 0.4s var(--ease) both;
 }
-.hist-unicorn svg { width: 100%; height: 100%; display: block; }
-.hist-unicorn-pos {
+.hist-horse:nth-child(2) { animation-delay: 60ms; }
+.hist-horse:nth-child(3) { animation-delay: 120ms; }
+.hist-horse:nth-child(4) { animation-delay: 180ms; }
+.hist-horse:nth-child(5) { animation-delay: 240ms; }
+.hist-horse svg { width: 100%; height: 100%; display: block; }
+.hist-horse-pos {
   position: absolute;
-  top: -13px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.4rem;
-  padding: 1px 4px;
-  border: 1px solid var(--ink);
-  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1;
+  padding: 2px 4px;
+  border: 1px solid #1d2430;
+  color: #1d2430;
   white-space: nowrap;
 }
-.hist-unicorn-num {
+.hist-horse-num {
   position: absolute;
   bottom: -6px;
-  right: -6px;
+  right: -7px;
   background: var(--ink);
   color: var(--dot);
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.42rem;
-  padding: 1px 3px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1;
+  padding: 2px 4px;
 }
-.hist-unicorn.pos-1 .hist-unicorn-pos { background: #ffd66b; }
-.hist-unicorn.pos-2 .hist-unicorn-pos { background: var(--silver); }
-.hist-unicorn.pos-3 .hist-unicorn-pos { background: #cd8a4f; color: var(--dot); }
-.hist-unicorn.pos-4 .hist-unicorn-pos { background: #ff8fce; }
-.hist-unicorn.pos-5 .hist-unicorn-pos { background: #c7c7e0; }
+/* podium plates: blue chrome, polished steel, gunmetal, then plain */
+.hist-horse.pos-1 .hist-horse-pos { background: linear-gradient(180deg, #ffffff, #cfe7ff 40%, #5f93c9 55%, #d4ebff); box-shadow: var(--glow); }
+.hist-horse.pos-2 .hist-horse-pos { background: var(--steel); }
+.hist-horse.pos-3 .hist-horse-pos { background: var(--steel-dark); color: var(--ink); border-color: #0d1219; }
+.hist-horse.pos-4 .hist-horse-pos,
+.hist-horse.pos-5 .hist-horse-pos { background: transparent; border-color: var(--line); color: var(--muted); }
 
 #puzzle-result-overlay { z-index: 60; }
 .puzzle-result {
   background: var(--card-bg);
-  border: 4px solid var(--ink);
+  border-radius: var(--radius);
   padding: 2rem;
   text-align: center;
   max-width: 320px;
-  box-shadow: 8px 8px 0 var(--brat-pink-deep);
+  box-shadow: 0 30px 80px -20px rgba(42, 15, 34, 0.5);
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
 }
-.result-piggy svg {
-  width: 120px;
-  height: 144px;
+.result-horse svg {
+  width: 110px;
+  height: 132px;
   display: block;
   margin: 0 auto 1.1rem;
+  overflow: visible;
+  filter: drop-shadow(0 8px 10px rgba(2, 10, 30, 0.6));
+}
+/* win: the knight turns blue chrome, spins and lands; lose: it topples over */
+.result-win svg { animation: knightSpin 1.1s var(--ease) both; filter: drop-shadow(0 8px 10px rgba(2, 10, 30, 0.6)) drop-shadow(0 0 18px rgba(127, 211, 255, 0.6)); }
+.result-lose svg { transform-origin: 85% 98%; animation: knightTopple 0.9s cubic-bezier(.5, 0, .3, 1.4) 0.15s both; }
+@keyframes knightSpin {
+  0% { transform: perspective(300px) translateY(24px) rotateY(-360deg) scale(0.7); opacity: 0; }
+  60% { transform: perspective(300px) translateY(-12px) rotateY(0) scale(1.05); opacity: 1; }
+  80% { transform: perspective(300px) translateY(0) scale(0.97); }
+  100% { transform: none; }
+}
+@keyframes knightTopple {
+  from { transform: rotate(0); }
+  to { transform: rotate(80deg) translateY(-10px); }
 }
 .result-text {
-  font-family: "Press Start 2P", monospace;
-  font-size: 1.1rem;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
   margin-bottom: 1.3rem;
 }
+.result-win + .result-text { color: var(--cyan); text-shadow: var(--glow); }
 
-/* ---------- click burst: confetti + pig fart ---------- */
+/* ---------- click burst: confetti ---------- */
 .confetti-piece {
   position: fixed;
   top: 0;
@@ -895,57 +1489,37 @@ body.piggy-cursor-active .unicorn-elim-toggle { cursor: none; }
   }
 }
 
-.fart-burst {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1500;
-  text-align: center;
-  transform: translate(-50%, -50%);
-  animation: fartFloat 1s ease-out forwards;
-}
-.fart-cloud {
-  position: relative;
-  width: 70px;
-  height: 40px;
-}
-.fart-cloud svg {
-  position: absolute;
-  display: block;
-  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.3));
-}
-.fart-cloud svg.puff-1 { width: 40px; height: 20px; left: 15px; top: 10px; animation: puffGrow 1s ease-out forwards; }
-.fart-cloud svg.puff-2 { width: 26px; height: 13px; left: 0; top: 0; animation: puffGrow 1s ease-out 0.08s forwards; opacity: 0; }
-.fart-cloud svg.puff-3 { width: 22px; height: 11px; left: 44px; top: 2px; animation: puffGrow 1s ease-out 0.14s forwards; opacity: 0; }
-@keyframes puffGrow {
-  0% { opacity: 0; transform: scale(0.3); }
-  25% { opacity: 0.95; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.5) translateY(-14px); }
-}
-.fart-text {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.85rem;
-  color: var(--brat-pink);
-  -webkit-text-stroke: 2px var(--ink);
-  paint-order: stroke fill;
-  margin-top: 2px;
-}
-@keyframes fartFloat {
-  0% { opacity: 0; transform: translate(-50%, -50%) translateY(0) scale(0.5) rotate(-6deg); }
-  15% { opacity: 1; transform: translate(-50%, -50%) translateY(-4px) scale(1.15) rotate(4deg); }
-  30% { transform: translate(-50%, -50%) translateY(-8px) scale(1) rotate(0deg); }
-  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-52px) scale(1.1) rotate(0deg); }
+/* ---------- motion off for people who ask for it ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .card, .puzzle-panel, .puzzle-result { transition: none !important; }
 }
 
-/* ---------- responsive ---------- */
-@media (max-width: 640px) {
-  :root { --header-h: 3.4rem; }
-  .milestone-label { font-size: 0.5rem; padding: 0.45rem 0.6rem; }
-  .milestone-marker { width: 38px; height: 38px; font-size: 0.75rem; }
-  .brat-title { font-size: clamp(1.8rem, 10vw, 3rem); }
-  .header-brand {
-    font-size: clamp(0.6rem, 3.2vw, 0.85rem);
-    padding: 0.25rem 0.4rem;
+/* ---------- responsive: stack on narrow screens, still one screen ---------- */
+@media (max-width: 760px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 14px;
+    padding: 22px 16px 16px;
   }
-  footer { font-size: 0.55rem; padding: 0.5rem; }
-  #maze-mode-btn { font-size: 0.5rem; padding: 0.45rem 0.7rem; }
+  .title { font-size: 2rem; margin-top: 0.4rem; }
+  .intro-lede, .title-block, .maze-hint, .drawing-bar .mono { display: none; }
+  .spec { margin-top: 0.8rem; }
+  .spec-row { padding: 0.35rem 0; grid-template-columns: 4.2rem 1fr; }
+  .section-label { display: none; }
+  .project-list { margin-top: 0.8rem; flex-direction: row; overflow-x: auto; }
+  .project-list li { flex: 0 0 auto; }
+  .project { width: auto; max-width: 240px; padding: 0.5rem 0.7rem; }
+  .project-num { display: none; }
+  .drawing-bar { justify-content: flex-end; padding: 0.5rem; }
+  .drawing-body { padding: 20px 10px 10px 20px; }
+  .ruler-x { left: 20px; right: 10px; }
+  .ruler-y { top: 20px; bottom: 10px; }
+  .card { padding: 2rem 1.25rem 1.5rem; }
 }

@@ -1,49 +1,22 @@
 /*
-  The actual puzzle: 25 unicorns, 5 racetracks, find the fastest 3 in the
-  minimum number of races. This does NOT walk the player through the
-  solution. They can race any group of 2 to 5 unicorns they like, as many
-  times as they like, and everything they've learned stays visible in the
-  race history so they can work out the logic themselves. Submitting the
-  wrong top 3 pops a "try again" Miss Piggy; submitting the right 3, in the
-  right order, pops a "you win" Miss Piggy.
+  The actual puzzle: 25 horses, 5 racetracks, find the fastest 3 in the
+  fewest races. The player builds every race themselves; nothing is
+  pre-run for them. They can race any group of 2 to 5 horses they like, as
+  many times as they like, mark horses as eliminated on their own scratch
+  pad, and submit a top 3 whenever they're ready. A wrong top 3 tips the
+  knight over ("try again"); the right 3, in the right order, turns it chrome.
 
-  Reuses unicornSVG()/renderPixelSVG() from unicorn-sprite.js and the
-  hair/face rows of PIGGY_BODY from piggy-sprite.js so the result popups
-  look like the same pig in a different outfit.
+  Horse icons come from horseSVG() in metal-sprites.js.
 */
 
-const PUZZLE_EXTRA_PALETTE = Object.assign({}, PIGGY_PALETTE, {
-  R: "#b47fe0", // try-again robe
-  F: "#fff2fa", // robe fur trim
-  X: "#1a0f16", // sunglasses band
-  K: "#1a1a22", // win coat
-  T: "#d99a4e"  // glam glove
-});
-
-const TRY_AGAIN_FRAME = PIGGY_BODY.slice(0, 7).concat([
-  "RRRRRRRRRR",
-  "FRRRRRRRRF",
-  "RFRRRRRRFR"
-]);
-
-const WIN_FRAME = [
-  PIGGY_BODY[0], PIGGY_BODY[1], PIGGY_BODY[2],
-  "HSSSSSSSSH",
-  "SXXXXXXXXS",
-  PIGGY_BODY[5], PIGGY_BODY[6],
-  "SKKKKKKKKS",
-  "KKKKKKKKKK",
-  "KTKKKKKKTK"
-];
-
-let pzUnicorns = [];
+let pzHorses = [];
 let pzRaceHistory = [];     // [{ n, ids: [finish order] }]
-let pzSelected = [];        // ordered array of currently selected unicorn ids
+let pzSelected = [];        // ordered array of currently selected horse ids
 let pzEliminated = new Set(); // player's own scratch-pad, purely visual
 let pzRaceCount = 0;
 let pzSolved = false;
 
-function pzGenerateUnicorns() {
+function pzGenerateHorses() {
   const speeds = Array.from({ length: 25 }, (_, i) => i + 1);
   for (let i = speeds.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -53,7 +26,7 @@ function pzGenerateUnicorns() {
 }
 
 function pzResetState() {
-  pzUnicorns = pzGenerateUnicorns();
+  pzHorses = pzGenerateHorses();
   pzRaceHistory = [];
   pzSelected = [];
   pzEliminated = new Set();
@@ -62,39 +35,39 @@ function pzResetState() {
 }
 
 function pzTrueTop3() {
-  return pzUnicorns.slice().sort((a, b) => a.speed - b.speed).slice(0, 3).map((h) => h.id);
+  return pzHorses.slice().sort((a, b) => a.speed - b.speed).slice(0, 3).map((h) => h.id);
 }
 
-function pzUnicornIconHTML(unicorn) {
-  const pickIndex = pzSelected.indexOf(unicorn.id);
+function pzHorseIconHTML(horse) {
+  const pickIndex = pzSelected.indexOf(horse.id);
   const selected = pickIndex !== -1;
-  const eliminated = pzEliminated.has(unicorn.id);
+  const eliminated = pzEliminated.has(horse.id);
 
-  const classes = ["unicorn-icon", "selectable"];
+  const classes = ["horse-icon", "selectable"];
   if (selected) classes.push("selected");
   if (eliminated) classes.push("eliminated");
 
   return `
-    <div class="${classes.join(" ")}" data-id="${unicorn.id}">
-      ${unicornSVG()}
-      <span class="unicorn-num">${unicorn.id}</span>
-      ${selected ? `<span class="unicorn-pick">${pickIndex + 1}</span>` : ""}
-      <button type="button" class="unicorn-elim-toggle" data-elim-id="${unicorn.id}" title="mark eliminated">✕</button>
+    <div class="${classes.join(" ")}" data-id="${horse.id}">
+      ${horseSVG()}
+      <span class="horse-num">${horse.id}</span>
+      ${selected ? `<span class="horse-pick">${pickIndex + 1}</span>` : ""}
+      <button type="button" class="horse-elim-toggle" data-elim-id="${horse.id}" title="mark eliminated">✕</button>
     </div>
   `;
 }
 
 const PZ_POSITION_NAMES = ["winner", "second", "third", "fourth", "fifth"];
 
-function pzHistUnicorns(race) {
+function pzHistHorses(race) {
   return race.ids
     .map((id, i) => {
       const pos = Math.min(i + 1, 5);
       return `
-        <div class="hist-unicorn pos-${pos}">
-          ${unicornSVG()}
-          <span class="hist-unicorn-pos">${PZ_POSITION_NAMES[i] || pos + "th"}</span>
-          <span class="hist-unicorn-num">${id}</span>
+        <div class="hist-horse pos-${pos}">
+          ${horseSVG()}
+          <span class="hist-horse-pos">${PZ_POSITION_NAMES[i] || pos + "th"}</span>
+          <span class="hist-horse-num">${id}</span>
         </div>
       `;
     })
@@ -106,14 +79,14 @@ function pzRenderBoard() {
   if (!board) return;
 
   let html = `<div class="puzzle-grid">`;
-  pzUnicorns.forEach((h) => {
-    html += pzUnicornIconHTML(h);
+  pzHorses.forEach((h) => {
+    html += pzHorseIconHTML(h);
   });
   html += `</div>`;
 
   html += `<div class="puzzle-history"><div class="puzzle-history-title">race history</div>`;
   if (pzRaceHistory.length === 0) {
-    html += `<p class="puzzle-history-empty">nothing raced yet. select 2 to 5 unicorns above and run your first race.</p>`;
+    html += `<p class="puzzle-history-empty">nothing raced yet. select 2 to 5 horses above and run your first race.</p>`;
   } else {
     pzRaceHistory
       .slice()
@@ -122,7 +95,7 @@ function pzRenderBoard() {
         html += `
           <div class="puzzle-history-row">
             <span class="puzzle-history-n">race ${race.n}</span>
-            <div class="hist-unicorns">${pzHistUnicorns(race)}</div>
+            <div class="hist-horses">${pzHistHorses(race)}</div>
           </div>
         `;
       });
@@ -131,11 +104,11 @@ function pzRenderBoard() {
 
   board.innerHTML = html;
 
-  board.querySelectorAll(".unicorn-icon.selectable").forEach((el) => {
+  board.querySelectorAll(".horse-icon.selectable").forEach((el) => {
     el.addEventListener("click", () => pzToggleSelect(Number(el.dataset.id)));
   });
 
-  board.querySelectorAll(".unicorn-elim-toggle").forEach((btn) => {
+  board.querySelectorAll(".horse-elim-toggle").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       pzToggleEliminate(Number(btn.dataset.elimId));
@@ -161,7 +134,7 @@ function pzRenderControls() {
   el.innerHTML = `
     <div class="puzzle-race-count">races run: ${pzRaceCount}. try to use as few as possible.</div>
     <p class="puzzle-instruction">
-      click any unicorns to build a race (2 to 5 at a time). the small ✕ on each one marks
+      click any horses to build a race (2 to 5 at a time). the small ✕ on each one marks
       it as eliminated from contention, just for your own tracking. once you've worked out
       the fastest 3, select exactly those 3 in order and submit your answer.
     </p>
@@ -210,7 +183,7 @@ function pzClearSelection() {
 
 function pzRunCustomRace() {
   if (pzSelected.length < 2 || pzSelected.length > 5) return;
-  const chosen = pzUnicorns
+  const chosen = pzHorses
     .filter((h) => pzSelected.includes(h.id))
     .slice()
     .sort((a, b) => a.speed - b.speed);
@@ -243,13 +216,13 @@ function pzShowResult(kind) {
   const content = document.getElementById("puzzle-result-content");
   if (!overlay || !content) return;
 
-  const frame = kind === "win" ? WIN_FRAME : TRY_AGAIN_FRAME;
-  const svg = renderPixelSVG(frame, PUZZLE_EXTRA_PALETTE);
+  // win: the knight turns blue chrome. lose: it tips over on its side.
+  const svg = kind === "win" ? horseSVG("chrome") : horseSVG();
   const message = kind === "win" ? "you win!" : "try again";
   const btnLabel = kind === "win" ? "play again" : "back to the grid";
 
   content.innerHTML = `
-    <div class="result-piggy">${svg}</div>
+    <div class="result-horse result-${kind}">${svg}</div>
     <div class="result-text">${message}</div>
     <button id="puzzle-result-btn" class="pixel-btn">${btnLabel}</button>
   `;

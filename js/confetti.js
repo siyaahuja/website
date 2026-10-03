@@ -1,13 +1,12 @@
 /*
-  Click anywhere that isn't a milestone (or a link/button) and get a burst
-  of pink + silver confetti, plus an unmistakable pixel fart cloud that
-  puffs out from the side of the piggy cursor. Milestone clicks call
+  Click anywhere that isn't a milestone (or a link/button) and get a small
+  burst of silver, white and blue confetti. Milestone clicks call
   e.stopPropagation() in maze.js so they never reach this listener.
 */
 
 const CONFETTI_COLORS = [
-  "#ff2d95", "#ff8fce", "#ffb3dd", "#c4187a",
-  "#e8e8e8", "#cfcfcf", "#ffffff"
+  "#ffffff", "#eaf2ff", "#c9d2de", "#9aa5b4",
+  "#7fd3ff", "#bfe8ff", "#2f80ed"
 ];
 
 function spawnConfetti(x, y, opts) {
@@ -57,56 +56,6 @@ function spawnConfettiBomb(x, y) {
 }
 window.spawnConfettiBomb = spawnConfettiBomb;
 
-const FART_CLOUD_GRID = [
-  ".CCCC.",
-  "CCCCCC",
-  ".CCCC."
-];
-
-function fartCloudSVG(puffClass) {
-  let rects = "";
-  FART_CLOUD_GRID.forEach((row, y) => {
-    [...row].forEach((ch, x) => {
-      if (ch === ".") return;
-      rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="#eceaf0"/>`;
-    });
-  });
-  return (
-    `<svg class="${puffClass}" viewBox="0 0 6 3" shape-rendering="crispEdges" ` +
-    `xmlns="http://www.w3.org/2000/svg">${rects}</svg>`
-  );
-}
-
-// Spawns from the REAR side of the pig (opposite whichever way she's
-// facing) so it visibly comes out of her, not out of thin air at the
-// click point.
-function spawnFart(fallbackX, fallbackY) {
-  const state = window.PIGGY_STATE;
-  const facing = state ? state.facing : 1;
-  const px = state ? state.x : fallbackX;
-  const py = state ? state.y : fallbackY;
-
-  const x = px - facing * 30;
-  const y = py + 14;
-
-  const el = document.createElement("div");
-  el.className = "fart-burst";
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
-  el.innerHTML = `
-    <div class="fart-cloud">
-      ${fartCloudSVG("puff-1")}
-      ${fartCloudSVG("puff-2")}
-      ${fartCloudSVG("puff-3")}
-    </div>
-    <div class="fart-text">pfft!</div>
-  `;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1050);
-
-  if (window.triggerPiggyFart) window.triggerPiggyFart();
-}
-
 function shouldTriggerBurst(target) {
   return !target.closest("#card-close, a, button, #maze-mode-btn");
 }
@@ -114,5 +63,4 @@ function shouldTriggerBurst(target) {
 document.addEventListener("click", (e) => {
   if (!shouldTriggerBurst(e.target)) return;
   spawnConfetti(e.clientX, e.clientY);
-  spawnFart(e.clientX, e.clientY);
 });
