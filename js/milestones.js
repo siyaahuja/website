@@ -79,6 +79,12 @@ const MILESTONES = [
     images: []
   },
   {
+    type: "github",
+    title: "view my projects",
+    tagline: "everything else i've built, on github",
+    href: "https://github.com/siyaahuja"
+  },
+  {
     type: "career",
     kind: "about",
     title: "getground",

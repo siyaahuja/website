@@ -4,6 +4,10 @@ function openMilestoneCard(data) {
   const overlay = document.getElementById("card-overlay");
   const content = document.getElementById("card-content");
   if (!overlay || !content) return;
+  if (data.href) {
+    window.open(data.href, "_blank", "noopener");
+    return;
+  }
 
   const tags = (data.tags || [])
     .map((t) => `<span class="tag">${t}</span>`)
@@ -139,7 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("project-list");
   if (!list) return;
 
-  const icons = { telephone: () => photoIcon("telephone", "") };
+  const icons = {
+    telephone: () => photoIcon("telephone", ""),
+    github: () => photoIcon("github", "")
+  };
   const items = MILESTONES.map((m, i) => ({
     kind: m.kind,
     title: m.title,

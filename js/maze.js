@@ -194,7 +194,8 @@ function pickMilestoneCells(n) {
 const MILESTONE_ICONS = {
   telephone: () => photoIcon("telephone", "rotary telephone dial"),
   career: () => photoIcon("work", "laptop"),
-  education: () => photoIcon("education", "folder")
+  education: () => photoIcon("education", "folder"),
+  github: () => photoIcon("github", "star (github)")
 };
 
 function placeMilestones() {
