@@ -1523,3 +1523,34 @@ body.guides-on .guide { opacity: 1; }
   .ruler-y { top: 20px; bottom: 10px; }
   .card { padding: 2rem 1.25rem 1.5rem; }
 }
+
+/* ---------- "view my projects" github link ---------- */
+.github-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.25rem 0;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  background: var(--steel);
+  color: var(--metal-edge);
+  border: 1px solid var(--metal-edge);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: filter 0.2s ease, transform 0.1s ease;
+}
+.github-link:hover { filter: brightness(1.06); }
+.github-link:active { transform: translateY(1px); }
+.github-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.github-link-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--metal-edge);
+}
